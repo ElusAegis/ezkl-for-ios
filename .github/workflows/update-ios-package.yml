@@ -25,7 +25,7 @@ jobs:
           override: true
 
       - name: Build EzklCoreBindings
-        run: CONFIGURATION=release cargo run --bin ios_gen_bindings --features ios-bindings
+        run: CONFIGURATION=release cargo build --features ios-bindings-test --no-default-features
 
       - name: Clone ezkl-ios-port repository
         run: |
@@ -59,20 +59,6 @@ jobs:
             -parallel-testing-enabled NO \
             -resultBundlePath ../../exampleTestResults \
             -skip-testing:EzklAppUITests/EzklAppUITests/testButtonClicksInOrder
-
-      - name: Upload Test Results (Package)
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: package-test-results
-          path: ./testResults
-
-      - name: Upload Test Results (Example)
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: example-app-test-results
-          path: ./exampleTestResults
 
       - name: Commit and Push Changes to feat/ezkl-direct-integration
         run: |
