@@ -16,6 +16,12 @@ fn main() {
     #[allow(unused_variables)]
     let target_arch = std::env::var("CARGO_CFG_TARGET_ARCH").unwrap();
 
+    #[cfg(all(any(feature = "ios-bindings", feature = "wasm32-bindings"), feature = "non-ios-wasm-bindings"))]
+    compile_error!("Invalid feature configuration. Use exclusively one of `ios-bindings`, `wasm32-bindings-test`, or `non-ios-wasm-bindings` features. Perhaps you forgot to disable the `default` features.");
+
+    #[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings", feature = "non-ios-wasm-bindings")))]
+    compile_error!("Invalid feature configuration. Make sure to pass `non-ios-wasm-bindings` feature if not building for iOS or WebAssembly.");
+
     #[cfg(not(feature = "wasm32-bindings"))]
     if target_arch == "wasm32" {
         panic!("Invalid feature configuration. Make sure to pass `wasm32-bindings` feature if building for WebAssembly.");
@@ -28,9 +34,6 @@ fn main() {
 
     #[cfg(all(feature = "ios-bindings-test", feature = "ios-bindings-build"))]
     compile_error!("Invalid feature configuration. Use exclusively one of `ios-bindings-test` or `ios-bindings-build` features.");
-
-    #[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings", feature = "non-ios-wasm-bindings")))]
-    compile_error!("Invalid feature configuration. Make sure to pass `non-ios-wasm-bindings` feature if not building for iOS or WebAssembly.");
 
     if cfg!(feature = "ios-bindings-test") {
         // Set the environment variable for test builds
