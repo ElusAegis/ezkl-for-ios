@@ -1,9 +1,9 @@
 use super::scale_to_multiplier;
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 use super::utilities::node_output_shapes;
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 use super::VarScales;
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 use super::Visibility;
 use crate::circuit::hybrid::HybridOp;
 use crate::circuit::lookup::LookupOp;
@@ -13,29 +13,29 @@ use crate::circuit::Constant;
 use crate::circuit::Input;
 use crate::circuit::Op;
 use crate::circuit::Unknown;
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 use crate::graph::errors::GraphError;
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 use crate::graph::new_op_from_onnx;
 use crate::tensor::TensorError;
 use halo2curves::bn256::Fr as Fp;
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 use log::trace;
 use serde::Deserialize;
 use serde::Serialize;
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 use std::collections::BTreeMap;
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 use std::fmt;
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 use tabled::Tabled;
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 use tract_onnx::{
     self,
     prelude::{Node as OnnxNode, SymbolValues, TypedFact, TypedOp},
 };
 
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 fn display_vector<T: fmt::Debug>(v: &Vec<T>) -> String {
     if !v.is_empty() {
         format!("{:?}", v)
@@ -44,7 +44,7 @@ fn display_vector<T: fmt::Debug>(v: &Vec<T>) -> String {
     }
 }
 
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 fn display_opkind(v: &SupportedOp) -> String {
     v.as_string()
 }
@@ -302,7 +302,7 @@ impl SupportedOp {
         }
     }
 
-    #[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+    #[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
     fn homogenous_rescale(
         &self,
         in_scales: Vec<crate::Scale>,
@@ -427,7 +427,7 @@ pub struct Node {
     pub num_uses: usize,
 }
 
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 impl Tabled for Node {
     const LENGTH: usize = 6;
 
@@ -467,7 +467,7 @@ impl Node {
     /// * `other_nodes` - [BTreeMap] of other previously initialized [Node]s in the computational graph.
     /// * `public_params` - flag if parameters of model are public
     /// * `idx` - The node's unique identifier.
-    #[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+    #[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         node: OnnxNode<TypedFact, Box<dyn TypedOp>>,
@@ -611,7 +611,7 @@ impl Node {
     }
 }
 
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 fn rescale_const_with_single_use(
     constant: &mut Constant<Fp>,
     in_scales: Vec<crate::Scale>,

@@ -1,4 +1,4 @@
-#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+#[cfg(feature = "wasm32-unknown-bindings")]
 #[cfg(test)]
 mod wasm32 {
     use ezkl::circuit::modules::polycommit::PolyCommitChip;

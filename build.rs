@@ -9,24 +9,38 @@ use {
     uuid::Uuid,
 };
 
-
-/// Name of the Rust library to generate bindings for
-#[cfg(feature = "ios-bindings-build")]
-const LIBRARY_NAME: &str = "ezkl";
-
 fn main() {
+
+    #[allow(unused_variables)]
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
+    #[allow(unused_variables)]
+    let target_arch = std::env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+
+    #[cfg(not(feature = "wasm32-bindings"))]
+    if target_arch == "wasm32" {
+        panic!("Invalid feature configuration. Make sure to pass `wasm32-bindings` feature if building for WebAssembly.");
+    }
+
+    #[cfg(not(feature = "wasm32-unknown-bindings"))]
+    if target_arch == "wasm32" && target_os == "unknown" {
+        panic!("Invalid feature configuration. Make sure to pass `wasm32-unknown-bindings` feature if building for WebAssembly Unknown.");
+    }
+
     #[cfg(all(feature = "ios-bindings-test", feature = "ios-bindings-build"))]
-    compile_error!("Invalid ios-bindings feature configuration. Use either `ios-bindings-test` or `ios-bindings-build` features.");
+    compile_error!("Invalid feature configuration. Use exclusively one of `ios-bindings-test` or `ios-bindings-build` features.");
+
+    #[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings", feature = "non-ios-wasm-bindings")))]
+    compile_error!("Invalid feature configuration. Make sure to pass `non-ios-wasm-bindings` feature if not building for iOS or WebAssembly.");
 
     if cfg!(feature = "ios-bindings-test") {
         // Set the environment variable for test builds
         println!("cargo:rustc-env=UNIFFI_CARGO_BUILD_EXTRA_ARGS=--features=ios-bindings --no-default-features");
-    } else if cfg!(feature = "ios-bindings-build") {
-        // Run the build logic for non-test builds
-        #[cfg(feature = "ios-bindings-build")]
+    }
+    #[cfg(feature = "ios-bindings-build")]
+     {
         let mode = determine_build_mode();
-        #[cfg(feature = "ios-bindings-build")]
-        build_bindings(LIBRARY_NAME, mode);
+        let library_name = std::env::var("CARGO_PKG_NAME").expect("CARGO_PKG_NAME is not set");
+        build_bindings(&library_name, mode);
     }
 
     println!("cargo:rerun-if-changed=build.rs");

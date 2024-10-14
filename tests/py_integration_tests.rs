@@ -1,4 +1,4 @@
-#[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+#[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
 #[cfg(test)]
 mod py_tests {
 

@@ -285,7 +285,7 @@ where
 }
 
 pub fn runconv() {
-    #[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+    #[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
     env_logger::init();
 
     const KERNEL_HEIGHT: usize = 5;

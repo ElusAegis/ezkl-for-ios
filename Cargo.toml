@@ -47,7 +47,6 @@ tosubcommand = { git = "https://github.com/zkonduit/enum_to_subcommand", package
 semver = { version = "1.0.22", optional = true }
 
 # evm related deps
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 alloy = { git = "https://github.com/alloy-rs/alloy", version = "0.1.0", rev="5fbf57bac99edef9d8475190109a7ea9fb7e5e83", features = ["provider-http", "signers", "contract", "rpc-types-eth", "signer-wallet", "node-bindings"], optional = true }
 foundry-compilers = { version = "0.4.1", features = ["svm-solc"], optional = true }
 ethabi = { version = "18", optional = true }
@@ -71,34 +70,29 @@ metal = { git = "https://github.com/gfx-rs/metal-rs", optional = true }
 objc = { version = "0.2.4", optional = true }
 mimalloc = { version = "0.1", optional = true }
 
-uniffi = { version = "=0.28.0", optional = true }
-
-[target.'cfg(not(all(target_arch = "wasm32", target_os = "unknown")))'.dependencies]
 colored = { version = "2.0.0", default-features = false, optional = true }
 env_logger = { version = "0.10.0", default-features = false, optional = true }
 chrono = { version = "0.4.31", optional = true }
 sha256 = { version = "1.4.0", optional = true }
 
+# Feature `wasm-bindings` dependencies
+getrandom = { version = "0.2.12", features = ["js"], optional = true }
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-getrandom = { version = "0.2.8", features = ["js"] }
-instant = { version = "0.1", features = ["wasm-bindgen", "inaccurate"] }
-
-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+# Feature `wasm-unknown-bindings` dependencies
 wasm-bindgen-rayon = { version = "1.2.1", optional = true }
-wasm-bindgen-test = "0.3.42"
-serde-wasm-bindgen = "0.6.5"
-wasm-bindgen = { version = "0.2.92", features = ["serde-serialize"] }
-console_error_panic_hook = "0.1.7"
-wasm-bindgen-console-logger = "0.1.1"
+wasm-bindgen-test = { version = "0.3.42", optional = true }
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
+wasm-bindgen = { version = "0.2.92", features = ["serde-serialize"], optional = true }
+console_error_panic_hook = { version = "0.1.7", optional = true }
+wasm-bindgen-console-logger = { version = "0.1.1", optional = true }
 
 
-[target.'cfg(not(all(target_arch = "wasm32", target_os = "unknown")))'.dev-dependencies]
-criterion = { version = "0.5.1", features = ["html_reports"] }
-
+# Feature `ios-bindings` dependencies
+uniffi = { version = "=0.28.0", optional = true }
 
 
 [build-dependencies]
+# Feature `ios-bindings` dependencies
 uniffi = { version = "0.28", features = ["build"], optional = true }
 uniffi_bindgen = { version = "=0.28.0", optional = true }
 camino = { version = "^1.1", optional = true }
@@ -112,6 +106,9 @@ seq-macro = "0.3.1"
 test-case = "2.2.2"
 tempdir = "0.3.7"
 shellexpand = "3.1.0"
+
+# Was not to be enabled for wasm-unknown
+criterion = { version = "0.5.1", features = ["html_reports"] }
 
 [target.wasm32-unknown-unknown]
 runner = 'wasm-bindgen-test-runner'
@@ -179,12 +176,14 @@ required-features = ["ezkl"]
 
 [features]
 web = ["wasm-bindgen-rayon"]
-default = ["ezkl", "mv-lookup", "precompute-coset", "no-banner", "parallel-poly-read", "enable-all"]
+default = ["ezkl", "mv-lookup", "precompute-coset", "no-banner", "parallel-poly-read"]
 onnx = ["dep:tract-onnx"]
 python-bindings = ["pyo3", "pyo3-log", "pyo3-asyncio"]
 ios-bindings = ["mv-lookup", "precompute-coset", "no-banner", "parallel-poly-read", "serde", "serde_json/std", "log", "halo2_proofs/circuit-params", "dep:uniffi", "dep:instant"]
 ios-bindings-build = ["ios-bindings", "uuid", "camino", "uniffi_bindgen"]
 ios-bindings-test = ["ios-bindings", "uniffi/bindgen-tests"]
+wasm32-bindings = ["mv-lookup", "precompute-coset", "no-banner", "parallel-poly-read", "serde", "serde_json/std", "log", "halo2_proofs/circuit-params", "getrandom/js", "instant/wasm-bindgen", "instant/inaccurate"]
+wasm32-unknown-bindings = ["wasm32-bindings", "wasm-bindgen-rayon", "wasm-bindgen-test", "serde-wasm-bindgen", "wasm-bindgen", "console_error_panic_hook", "wasm-bindgen-console-logger"]
 ezkl = [
     "onnx",
     "serde",
@@ -199,7 +198,7 @@ ezkl = [
     "dep:portable-atomic",
     "dep:clap_complete",
 ]
-enable-all = [
+non-ios-wasm-bindings = [
     "dep:alloy",
     "dep:foundry-compilers",
     "dep:ethabi",
@@ -245,5 +244,3 @@ uniffi_testing = { path = "../uniffi-rs/uniffi_testing" }
 rustflags = ["-C", "relocation-model=pic"]
 lto = "fat"
 codegen-units = 1
-# panic = "abort"
-

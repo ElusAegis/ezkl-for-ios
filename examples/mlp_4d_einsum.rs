@@ -220,7 +220,7 @@ impl<const LEN: usize, const LOOKUP_MIN: IntegerRep, const LOOKUP_MAX: IntegerRe
 }
 
 pub fn runmlp() {
-    #[cfg(not(any(feature = "ios-bindings", target_arch = "wasm32")))]
+    #[cfg(not(any(feature = "ios-bindings", feature = "wasm32-bindings")))]
     env_logger::init();
     // parameters
     let mut l0_kernel: Tensor<F> = Tensor::<IntegerRep>::new(
