@@ -511,7 +511,7 @@ jobs:
         run: cargo nextest run --verbose tests_aggr::kzg_aggr_prove_and_verify_  --features icicle --test-threads 1 -- --include-ignored
 
   prove-and-verify-aggr-tests:
-    runs-on: large-self-hosted
+    runs-on: ubuntu-latest
     needs: [build, library-tests, docs, python-tests, python-integration-tests]
     steps:
       - uses: actions/checkout@v4
@@ -528,7 +528,7 @@ jobs:
         run: cargo nextest run --release --verbose tests_aggr::kzg_aggr_prove_and_verify_  --test-threads 4 -- --include-ignored
 
   prove-and-verify-aggr-evm-tests:
-    runs-on: large-self-hosted
+    runs-on: ubuntu-latest
     needs: [build, library-tests, docs, python-tests, python-integration-tests]
     steps:
       - uses: actions/checkout@v4
@@ -624,7 +624,7 @@ jobs:
         run: source .env/bin/activate; cargo nextest run --release --verbose tests::resources_accuracy_measurement_public_outputs_
 
   python-integration-tests:
-    runs-on: large-self-hosted
+    runs-on: ubuntu-latest
     services:
       # Label used to access the service container
       postgres:
