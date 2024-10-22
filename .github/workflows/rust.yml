@@ -45,7 +45,7 @@ jobs:
         run: cargo doc --verbose
 
   library-tests:
-    runs-on: ubuntu-latest-32-cores
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
@@ -101,7 +101,7 @@ jobs:
   #       run: cargo nextest run conv_relu_col_ultra_overflow --no-capture --features icicle -- --include-ignored
 
   ultra-overflow-tests_og-lookup:
-    runs-on: non-gpu
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
@@ -134,7 +134,7 @@ jobs:
         run: cargo nextest run  --release conv_relu_col_ultra_overflow --no-capture --no-default-features --features ezkl -- --include-ignored
 
   ultra-overflow-tests:
-    runs-on: non-gpu
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
@@ -167,7 +167,7 @@ jobs:
         run: cargo nextest run  --release conv_relu_col_ultra_overflow --no-capture -- --include-ignored
 
   model-serialization:
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
@@ -225,7 +225,7 @@ jobs:
         run: cargo nextest run --release --verbose tests::tutorial_
 
   mock-proving-tests:
-    runs-on: non-gpu
+    runs-on: ubuntu-latest
     needs: [build, library-tests, docs, python-tests, python-integration-tests]
     steps:
       - uses: actions/checkout@v4
@@ -286,7 +286,7 @@ jobs:
         run: cargo nextest run --release --verbose tests::mock_fixed_params_ --test-threads 32
 
   prove-and-verify-evm-tests:
-    runs-on: non-gpu
+    runs-on: ubuntu-latest
     needs: [build, library-tests, docs, python-tests, python-integration-tests]
     steps:
       - uses: actions/checkout@v4
@@ -365,7 +365,7 @@ jobs:
         run: cargo nextest run --release --verbose tests_evm::kzg_evm_hashed_output_prove_and_verify --test-threads 1
 
   prove-and-verify-tests:
-    runs-on: non-gpu
+    runs-on: ubuntu-latest
     needs: [build, library-tests, docs]
     steps:
       - uses: actions/checkout@v4
@@ -511,7 +511,7 @@ jobs:
         run: cargo nextest run --verbose tests_aggr::kzg_aggr_prove_and_verify_  --features icicle --test-threads 1 -- --include-ignored
 
   prove-and-verify-aggr-tests:
-    runs-on: large-self-hosted
+    runs-on: ubuntu-latest
     needs: [build, library-tests, docs, python-tests, python-integration-tests]
     steps:
       - uses: actions/checkout@v4
@@ -528,7 +528,7 @@ jobs:
         run: cargo nextest run --release --verbose tests_aggr::kzg_aggr_prove_and_verify_  --test-threads 4 -- --include-ignored
 
   prove-and-verify-aggr-evm-tests:
-    runs-on: large-self-hosted
+    runs-on: ubuntu-latest
     needs: [build, library-tests, docs, python-tests, python-integration-tests]
     steps:
       - uses: actions/checkout@v4
@@ -549,7 +549,7 @@ jobs:
         run: cargo nextest run  --release --verbose tests_evm::kzg_evm_aggr_prove_and_verify_::t --test-threads 4 -- --include-ignored
 
   examples:
-    runs-on: ubuntu-latest-32-cores
+    runs-on: ubuntu-latest
     needs: [build, library-tests, docs]
     steps:
       - uses: actions/checkout@v4
@@ -566,7 +566,7 @@ jobs:
         run: cargo nextest run --release tests_examples
 
   python-tests:
-    runs-on: non-gpu
+    runs-on: ubuntu-latest
     needs: [build, library-tests, docs]
     steps:
       - uses: actions/checkout@v4
@@ -592,7 +592,7 @@ jobs:
         run: source .env/bin/activate; pip install pytest-asyncio; pytest -vv
 
   accuracy-measurement-tests:
-    runs-on: ubuntu-latest-32-cores
+    runs-on: ubuntu-latest
     needs: [build, library-tests, docs, python-tests, python-integration-tests]
     steps:
       - uses: actions/checkout@v4
@@ -624,7 +624,7 @@ jobs:
         run: source .env/bin/activate; cargo nextest run --release --verbose tests::resources_accuracy_measurement_public_outputs_
 
   python-integration-tests:
-    runs-on: large-self-hosted
+    runs-on: ubuntu-latest
     services:
       # Label used to access the service container
       postgres:
@@ -688,3 +688,66 @@ jobs:
         run: source .env/bin/activate; cargo nextest run py_tests::tests::nbeats_
       # - name: Reusable verifier tutorial
         # run: source .env/bin/activate; cargo nextest run py_tests::tests::reusable_
+
+  ios-integration-tests:
+      runs-on: macos-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions-rs/toolchain@v1
+          with:
+            toolchain: nightly-2024-07-18
+            override: true
+            components: rustfmt, clippy
+        - uses: baptiste0928/cargo-install@v1
+          with:
+            crate: cargo-nextest
+            locked: true
+        - name: Run ios tests
+          run: CARGO_BUILD_TARGET=aarch64-apple-darwin RUSTUP_TOOLCHAIN=nightly-2024-07-18-aarch64-apple-darwin cargo test --test ios_integration_tests --features ios-bindings-test --no-default-features
+
+  swift-package-tests:
+      runs-on: macos-latest
+      needs: [ios-integration-tests]
+
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions-rs/toolchain@v1
+          with:
+            toolchain: nightly-2024-07-18
+            override: true
+            components: rustfmt, clippy
+        - name: Build EzklCoreBindings
+          run: CONFIGURATION=debug cargo run --bin ios_gen_bindings --features "ios-bindings uuid camino uniffi_bindgen" --no-default-features
+
+        - name: Clone ezkl-swift- repository
+          run: |
+            git clone https://github.com/zkonduit/ezkl-swift-package.git
+
+        - name: Copy EzklCoreBindings
+          run: |
+            rm -rf ezkl-swift-package/Sources/EzklCoreBindings
+            cp -r build/EzklCoreBindings ezkl-swift-package/Sources/
+
+        - name: Set up Xcode environment
+          run: |
+            sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+            sudo xcodebuild -license accept
+
+        - name: Run Package Tests
+          run: |
+            cd ezkl-swift-package
+            xcodebuild test \
+              -scheme EzklPackage \
+              -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5' \
+              -resultBundlePath ../testResults
+
+        - name: Run Example App Tests
+          run: |
+            cd ezkl-swift-package/Example
+            xcodebuild test \
+              -project Example.xcodeproj \
+              -scheme EzklApp \
+              -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5' \
+              -parallel-testing-enabled NO \
+              -resultBundlePath ../../exampleTestResults \
+              -skip-testing:EzklAppUITests/EzklAppUITests/testButtonClicksInOrder
