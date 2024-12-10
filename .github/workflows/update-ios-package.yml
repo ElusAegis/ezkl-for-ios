@@ -14,7 +14,7 @@ jobs:
   build-and-update:
     runs-on: macos-latest
     env:
-      EZKL_SWIFT_PACKAGE_REPO: github.com/zkonduit/ezkl-swift-package.git
+      EZKL_SWIFT_PACKAGE_REPO: github.com/ElusAegis/ezkl-swift-package.git
 
     steps:
       - name: Checkout EZKL
@@ -88,7 +88,7 @@ jobs:
           cd ezkl-swift-package
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git remote set-url origin https://zkonduit:${EZKL_SWIFT_PACKAGE_REPO_TOKEN}@${{ env.EZKL_SWIFT_PACKAGE_REPO }}
+          git remote set-url origin https://ElusAegis:${EZKL_SWIFT_PACKAGE_REPO_TOKEN}@${{ env.EZKL_SWIFT_PACKAGE_REPO }}
 
       - name: Commit and Push Changes
         if: steps.check_changes.outputs.no_changes == 'false'
