@@ -2416,6 +2416,7 @@ dependencies = [
 [[package]]
 name = "halo2_proofs"
 version = "0.3.0"
+source = "git+https://github.com/ElusAegis/halo2-zkonduit?branch=feat/msm-gpu-acceleration-debug#54e467940498a9ece2c272e1eaf4a6139c423f0e"
 dependencies = [
  "bincode",
  "blake2b_simd",
@@ -3424,6 +3425,7 @@ dependencies = [
 [[package]]
 name = "mopro-msm"
 version = "0.1.0"
+source = "git+https://github.com/ElusAegis/metal-msm-gpu-acceleration.git?branch=feat/further-gpu-acceleration#39d94cfa97d8377951b9f56ee89c7d6ec64e4caf"
 dependencies = [
  "bincode",
  "env_logger 0.11.6",

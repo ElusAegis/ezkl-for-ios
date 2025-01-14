@@ -275,10 +275,10 @@ no-update = []
 metal = ["halo2_proofs/macos"]
 
 [patch.'https://github.com/zkonduit/halo2']
-halo2_proofs = { path = "../zkonduit-halo2/halo2_proofs" }
+halo2_proofs = { git = "https://github.com/ElusAegis/halo2-zkonduit", branch = "feat/msm-gpu-acceleration-debug", optional = true }
 
 [patch.'https://github.com/zkonduit/halo2#0654e92bdf725fd44d849bfef3643870a8c7d50b']
-halo2_proofs = { path = "../zkonduit-halo2/halo2_proofs" }
+halo2_proofs = { git = "https://github.com/ElusAegis/halo2-zkonduit", branch = "feat/msm-gpu-acceleration-debug", optional = true }
 
 [patch.crates-io]
 uniffi_testing = { git = "https://github.com/ElusAegis/uniffi-rs", branch = "feat/testing-feature-build-fix" }
