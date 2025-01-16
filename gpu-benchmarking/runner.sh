@@ -12,63 +12,95 @@ if [ "$(basename "$PWD")" != "$EXPECTED_DIR" ]; then
     fi
 fi
 
-
 # Define variables
-ITERATIONS=30
+ITERATIONS=2
 CPU_SUFFIX="_cpu"
-GPU_SUFFIX="_gpu_2_5"
+GPU_SUFFIX="_gpu"
 CPU_BINARY="../target/release/ezkl${CPU_SUFFIX}"
 GPU_BINARY="../target/release/ezkl${GPU_SUFFIX}"
-CPU_CMD="$CPU_BINARY prove"
-GPU_CMD="$GPU_BINARY prove"
+CPU_SETUP_CMD="$CPU_BINARY setup"
+GPU_SETUP_CMD="$GPU_BINARY setup"
+CPU_PROVE_CMD="$CPU_BINARY prove"
+GPU_PROVE_CMD="$GPU_BINARY prove"
 
-# Build binaries
-echo "Building CPU binary..."
-cargo build --release
-mv ../target/release/ezkl $CPU_BINARY
-
-echo "Building GPU binary..."
-cargo build --release --features "metal"
-mv ../target/release/ezkl $GPU_BINARY
-
-# Prepare necessary files
-echo "Generating test files..."
-$CPU_BINARY compile-circuit > /dev/null 2>&1
-$CPU_BINARY setup > /dev/null 2>&1
-$CPU_BINARY gen-witness > /dev/null 2>&1
+## Build binaries
+#echo "Building CPU binary..."
+#cargo build --release
+#mv ../target/release/ezkl $CPU_BINARY
+#
+#echo "Building GPU binary..."
+#cargo build --release --features "metal"
+#mv ../target/release/ezkl $GPU_BINARY
+#
+## Prepare necessary files
+#echo "Generating test files..."
+#$CPU_BINARY compile-circuit > /dev/null 2>&1
+#$CPU_BINARY setup > /dev/null 2>&1
+#$CPU_BINARY gen-witness > /dev/null 2>&1
 
 # Initialize totals
-cpu_total_time=0
-gpu_total_time=0
+cpu_setup_total_time=0
+gpu_setup_total_time=0
+cpu_prove_total_time=0
+gpu_prove_total_time=0
 
-# Run CPU benchmark
-echo "Running $CPU_CMD $ITERATIONS times..."
+# Benchmark GPU setup
+echo "Running GPU setup $ITERATIONS times..."
 for i in $(seq 1 $ITERATIONS); do
     start_time=$(date +%s.%N)
-    $CPU_CMD > /dev/null 2>&1
+    $GPU_SETUP_CMD > /dev/null 2>&1
     end_time=$(date +%s.%N)
     elapsed_time=$(echo "$end_time - $start_time" | bc)
-    cpu_total_time=$(echo "$cpu_total_time + $elapsed_time" | bc)
-    echo "CPU Run #$i: $elapsed_time seconds"
+    gpu_setup_total_time=$(echo "$gpu_setup_total_time + $elapsed_time" | bc)
+    echo "GPU Setup Run #$i: $elapsed_time seconds"
 done
 
-# Run GPU benchmark
-echo "Running $GPU_CMD $ITERATIONS times..."
+# Benchmark CPU setup
+echo "Running CPU setup $ITERATIONS times..."
 for i in $(seq 1 $ITERATIONS); do
     start_time=$(date +%s.%N)
-    $GPU_CMD > /dev/null 2>&1
+    $CPU_SETUP_CMD > /dev/null 2>&1
     end_time=$(date +%s.%N)
     elapsed_time=$(echo "$end_time - $start_time" | bc)
-    gpu_total_time=$(echo "$gpu_total_time + $elapsed_time" | bc)
-    echo "GPU Run #$i: $elapsed_time seconds"
+    cpu_setup_total_time=$(echo "$cpu_setup_total_time + $elapsed_time" | bc)
+    echo "CPU Setup Run #$i: $elapsed_time seconds"
+done
+
+# Benchmark GPU prove
+echo "Running GPU prove $ITERATIONS times..."
+for i in $(seq 1 $ITERATIONS); do
+    start_time=$(date +%s.%N)
+    $GPU_PROVE_CMD > /dev/null 2>&1
+    end_time=$(date +%s.%N)
+    elapsed_time=$(echo "$end_time - $start_time" | bc)
+    gpu_prove_total_time=$(echo "$gpu_prove_total_time + $elapsed_time" | bc)
+    echo "GPU Prove Run #$i: $elapsed_time seconds"
+done
+
+# Benchmark CPU prove
+echo "Running CPU prove $ITERATIONS times..."
+for i in $(seq 1 $ITERATIONS); do
+    start_time=$(date +%s.%N)
+    $CPU_PROVE_CMD > /dev/null 2>&1
+    end_time=$(date +%s.%N)
+    elapsed_time=$(echo "$end_time - $start_time" | bc)
+    cpu_prove_total_time=$(echo "$cpu_prove_total_time + $elapsed_time" | bc)
+    echo "CPU Prove Run #$i: $elapsed_time seconds"
 done
 
 # Calculate averages
-cpu_avg_time=$(echo "$cpu_total_time / $ITERATIONS" | bc -l)
-gpu_avg_time=$(echo "$gpu_total_time / $ITERATIONS" | bc -l)
+cpu_setup_avg_time=$(echo "$cpu_setup_total_time / $ITERATIONS" | bc -l)
+gpu_setup_avg_time=$(echo "$gpu_setup_total_time / $ITERATIONS" | bc -l)
+cpu_prove_avg_time=$(echo "$cpu_prove_total_time / $ITERATIONS" | bc -l)
+gpu_prove_avg_time=$(echo "$gpu_prove_total_time / $ITERATIONS" | bc -l)
 
 # Output results
 echo "======================================="
-echo "CPU Average Time: $cpu_avg_time seconds"
-echo "GPU Average Time: $gpu_avg_time seconds"
+echo "Setup Results:"
+echo "CPU Average Setup Time: $cpu_setup_avg_time seconds"
+echo "GPU Average Setup Time: $gpu_setup_avg_time seconds"
+echo "---------------------------------------"
+echo "Prove Results:"
+echo "CPU Average Prove Time: $cpu_prove_avg_time seconds"
+echo "GPU Average Prove Time: $gpu_prove_avg_time seconds"
 echo "======================================="

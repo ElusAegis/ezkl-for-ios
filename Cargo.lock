@@ -2399,7 +2399,7 @@ dependencies = [
 [[package]]
 name = "halo2_gadgets"
 version = "0.2.0"
-source = "git+https://github.com/zkonduit/halo2#0654e92bdf725fd44d849bfef3643870a8c7d50b"
+source = "git+https://github.com/zkonduit/halo2#ee4e1a09ebdb1f79f797685b78951c6034c430a6"
 dependencies = [
  "arrayvec 0.7.4",
  "bitvec",
@@ -3425,7 +3425,7 @@ dependencies = [
 [[package]]
 name = "mopro-msm"
 version = "0.1.0"
-source = "git+https://github.com/ElusAegis/metal-msm-gpu-acceleration.git?branch=feat/further-gpu-acceleration#39d94cfa97d8377951b9f56ee89c7d6ec64e4caf"
+source = "git+https://github.com/ElusAegis/metal-msm-gpu-acceleration.git?branch=feat/further-gpu-acceleration#125fc50ecdb258af873ebaba1af9c3f7a9db330b"
 dependencies = [
  "bincode",
  "env_logger 0.11.6",
