@@ -23,20 +23,20 @@ GPU_SETUP_CMD="$GPU_BINARY setup"
 CPU_PROVE_CMD="$CPU_BINARY prove"
 GPU_PROVE_CMD="$GPU_BINARY prove"
 
-## Build binaries
-#echo "Building CPU binary..."
-#cargo build --release
-#mv ../target/release/ezkl $CPU_BINARY
-#
-#echo "Building GPU binary..."
-#cargo build --release --features "metal"
-#mv ../target/release/ezkl $GPU_BINARY
-#
-## Prepare necessary files
-#echo "Generating test files..."
-#$CPU_BINARY compile-circuit > /dev/null 2>&1
-#$CPU_BINARY setup > /dev/null 2>&1
-#$CPU_BINARY gen-witness > /dev/null 2>&1
+# Build binaries
+echo "Building CPU binary..."
+cargo build --release
+mv ../target/release/ezkl $CPU_BINARY
+
+echo "Building GPU binary..."
+cargo build --release --features "metal"
+mv ../target/release/ezkl $GPU_BINARY
+
+# Prepare necessary files
+echo "Generating test files..."
+$CPU_BINARY compile-circuit > /dev/null 2>&1
+$CPU_BINARY setup > /dev/null 2>&1
+$CPU_BINARY gen-witness > /dev/null 2>&1
 
 # Initialize totals
 cpu_setup_total_time=0
