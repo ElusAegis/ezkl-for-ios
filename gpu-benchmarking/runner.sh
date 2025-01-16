@@ -13,7 +13,7 @@ if [ "$(basename "$PWD")" != "$EXPECTED_DIR" ]; then
 fi
 
 # Define variables
-ITERATIONS=2
+ITERATIONS=50
 CPU_SUFFIX="_cpu"
 GPU_SUFFIX="_gpu"
 CPU_BINARY="../target/release/ezkl${CPU_SUFFIX}"
